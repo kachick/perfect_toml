@@ -29,7 +29,7 @@ task :toml_encoder_test => TOML_TEST do
     ENV["TOML_ENCODER_SORT_KEYS"] = mode[1]
     ENV["TOML_ENCODER_USE_LITERAL_STRING"] = mode[2]
     ENV["TOML_ENCODER_USE_MULTILINE_STRING"] = mode[3]
-    puts ENV.select { |k, _| k.start_with?("TOML_ENCODER_") }
+    puts ENV.select { |k, _| k.start_with?("TOML_ENCODER_") }.map{ |k, v| "#{k}=#{v}" }.join(" ")
     sh "./toml-test-v1.4.0-linux-amd64", "./tool/encoder.rb", "--encoder", "-skip", "valid/string/multiline-quotes"
   end
 end
