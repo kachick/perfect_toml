@@ -8,30 +8,35 @@ Rake::TestTask.new(:core_test) do |t|
   t.test_files = FileList["test/**/*_test.rb"]
 end
 
-TOML_TEST = "./toml-test-v1.2.0-linux-amd64"
+TOML_TEST = "./toml-test-v1.4.0-linux-amd64"
 
 file TOML_TEST do
   require "open-uri"
   require "zlib"
-  URI.open("https://github.com/BurntSushi/toml-test/releases/download/v1.2.0/toml-test-v1.2.0-linux-amd64.gz", "rb") do |f|
+  URI.open("https://github.com/BurntSushi/toml-test/releases/download/v1.4.0/toml-test-v1.4.0-linux-amd64.gz", "rb") do |f|
     File.binwrite(TOML_TEST, Zlib::GzipReader.new(f).read)
     File.chmod(0o755, TOML_TEST)
   end
 end
 
 task :toml_decoder_test => TOML_TEST do
-  sh "./toml-test-v1.2.0-linux-amd64", "./tool/decoder.rb"
+  sh "./toml-test-v1.4.0-linux-amd64", "./tool/decoder.rb"
 end
 
-task :toml_encoder_test => TOML_TEST do
-  ["0000", "1000", "0010", "0001", "0011"].each do |mode|
+encoder_modes = ["0000", "1000", "0010", "0001", "0011"]
+
+encoder_modes.each do |mode|
+  task :"toml_encoder_test:#{mode}" => TOML_TEST do
     ENV["TOML_ENCODER_USE_DOT"] = mode[0]
     ENV["TOML_ENCODER_SORT_KEYS"] = mode[1]
     ENV["TOML_ENCODER_USE_LITERAL_STRING"] = mode[2]
     ENV["TOML_ENCODER_USE_MULTILINE_STRING"] = mode[3]
-    sh "./toml-test-v1.2.0-linux-amd64", "./tool/encoder.rb", "--encoder", "-skip", "valid/string/multiline-quotes"
+    puts ENV.select { |k, _| k.start_with?("TOML_ENCODER_") }.map{ |k, v| "#{k}=#{v}" }.join(" ")
+    sh "./toml-test-v1.4.0-linux-amd64", "./tool/encoder.rb", "--encoder", "-skip", "valid/string/multiline-quotes"
   end
 end
+
+task :toml_encoder_test => encoder_modes.map { |mode| :"toml_encoder_test:#{mode}" }
 
 task :test => [:core_test, :toml_decoder_test, :toml_encoder_test]
 
