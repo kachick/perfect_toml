@@ -8,3 +8,5 @@
 /tmp/
 
 /toml-test-v1.2.0-linux-amd64
+
+Gemfile.lock
