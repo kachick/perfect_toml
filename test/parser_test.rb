@@ -85,7 +85,7 @@ a = { b = 1
   def test_lf
     exp = { "a" => 'str\ning\"\"' }
 
-    assert_equal(exp, PerfectTOML.parse(<<-'END'))
+    assert_equal(exp, PerfectTOML.parse(<<-"END"))
 a = """str\ning"""""
     END
   end
@@ -93,7 +93,7 @@ a = """str\ning"""""
   def test_crlf
     exp = { "a" => 'str\r\ning\"\"' }
 
-    assert_equal(exp, PerfectTOML.parse(<<-'END'))
+    assert_equal(exp, PerfectTOML.parse(<<-"END"))
 a = """str\r\ning"""""
     END
   end
