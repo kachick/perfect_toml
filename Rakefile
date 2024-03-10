@@ -23,8 +23,10 @@ task :toml_decoder_test => TOML_TEST do
   sh "./toml-test-v1.4.0-linux-amd64", "./tool/decoder.rb"
 end
 
-task :toml_encoder_test => TOML_TEST do
-  ["0000", "1000", "0010", "0001", "0011"].each do |mode|
+encoder_modes = ["0000", "1000", "0010", "0001", "0011"]
+
+encoder_modes.each do |mode|
+  task :"toml_encoder_test:#{mode}" => TOML_TEST do
     ENV["TOML_ENCODER_USE_DOT"] = mode[0]
     ENV["TOML_ENCODER_SORT_KEYS"] = mode[1]
     ENV["TOML_ENCODER_USE_LITERAL_STRING"] = mode[2]
@@ -33,6 +35,8 @@ task :toml_encoder_test => TOML_TEST do
     sh "./toml-test-v1.4.0-linux-amd64", "./tool/encoder.rb", "--encoder", "-skip", "valid/string/multiline-quotes"
   end
 end
+
+task :toml_encoder_test => encoder_modes.map { |mode| :"toml_encoder_test:#{mode}" }
 
 task :test => [:core_test, :toml_decoder_test, :toml_encoder_test]
 
